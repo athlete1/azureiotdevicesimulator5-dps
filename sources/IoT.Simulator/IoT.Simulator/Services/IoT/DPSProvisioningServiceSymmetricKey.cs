@@ -98,7 +98,11 @@ namespace IoT.Simulator.Services
                     _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Initialized for registration Id {security.GetRegistrationID()}.");
                     _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Registering with the device provisioning service...");
 
-                    DeviceRegistrationResult deviceRegistrationResult = await provClient.RegisterAsync();
+                    try
+                    {
+                        DeviceRegistrationResult deviceRegistrationResult = await provClient.RegisterAsync();
+                    
+                    
 
                     if (deviceRegistrationResult != null)
                     {
@@ -132,6 +136,13 @@ namespace IoT.Simulator.Services
                     }
                     else
                         _logger.LogError($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::No provisioning result has been received.");
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
                 }
             }
 

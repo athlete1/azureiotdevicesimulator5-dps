@@ -1,0 +1,246 @@
+{
+  "deviceId": "",
+  "moduleId": "",
+  "deviceModel": "FeedHub",
+  "timestamp": 0,
+  "schemaVersion": "v1.0",
+  "messageType": "status",
+  "data": [
+    {
+      "key": "CID",
+      "value": 0
+    },
+    {
+      "key": "CMY",
+      "value": "2021"
+    },
+    {
+      "key": "CS",
+      "value": "S"
+    },
+    {
+      "key": "IC",
+      "value": "1"
+    },
+    {
+      "key": "GPF",
+      "value": "5"
+    },
+    {
+      "key": "LAT",
+      "value": "38.325283 N"
+    },
+    {
+      "key": "LON",
+      "value": "93.361084 W"
+    },
+    {
+      "key": "MDN",
+      "value": "5258443151"
+    },
+    {
+      "key": "MFR",
+      "value": "F"
+    },
+    {
+      "key": "MPC",
+      "value": "F"
+    },
+    {
+      "key": "MSID",
+      "value": ""
+    },
+    {
+      "key": "MT",
+      "value": "C"
+    },
+    {
+      "key": "MV",
+      "value": "1.0.0"
+    },
+    {
+      "key": "MW",
+      "value": "C"
+    },
+    {
+      "key": "SIM",
+      "value": ""
+    },
+    {
+      "key": "VCT",
+      "value": "0"
+    }
+  ]
+}
+  //"modemSettings": [
+  //  {
+  //    "setting_short_text": "MUC",
+  //    "value": "0"
+  //  },
+  //  {
+  //    "setting_short_text": "MTH",
+  //    "value": "22"
+  //  },
+  //  {
+  //    "setting_short_text": "MTM",
+  //    "value": "10"
+  //  },
+  //  {
+  //    "setting_short_text": "MT",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "MWL",
+  //    "value": "10000"
+  //  },
+  //  {
+  //    "setting_short_text": "MMD",
+  //    "value": "N"
+  //  },
+  //  {
+  //    "setting_short_text": "MSA",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "MSP",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "MOS",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "MOP",
+  //    "value": "80"
+  //  },
+  //  {
+  //    "setting_short_text": "MOF",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "MOB",
+  //    "value": "0"
+  //  },
+  //  {
+  //    "setting_short_text": "MOC",
+  //    "value": "0"
+  //  },
+  //  {
+  //    "setting_short_text": "MTI",
+  //    "value": "0"
+  //  }
+  //],
+  //"cameraSettings": [
+  //  {
+  //    "setting_short_text": "CMM",
+  //    "value": "T"
+  //  },
+  //  {
+  //    "setting_short_text": "CFF",
+  //    "value": "T"
+  //  },
+  //  {
+  //    "setting_short_text": "CI",
+  //    "value": "T"
+  //  },
+  //  {
+  //    "setting_short_text": "CMS",
+  //    "value": "1"
+  //  },
+  //  {
+  //    "setting_short_text": "CT",
+  //    "value": "F"
+  //  },
+  //  {
+  //    "setting_short_text": "CHD",
+  //    "value": "DCIM"
+  //  },
+  //  {
+  //    "setting_short_text": "CTD",
+  //    "value": "M"
+  //  },
+  //  {
+  //    "setting_short_text": "CPS",
+  //    "value": "H"
+  //  },
+  //  {
+  //    "setting_short_text": "CT1",
+  //    "value": "6"
+  //  },
+  //  {
+  //    "setting_short_text": "CP1",
+  //    "value": "9"
+  //  },
+  //  {
+  //    "setting_short_text": "CL1",
+  //    "value": "600"
+  //  },
+  //  {
+  //    "setting_short_text": "CT2",
+  //    "value": "16"
+  //  },
+  //  {
+  //    "setting_short_text": "CP2",
+  //    "value": "19"
+  //  },
+  //  {
+  //    "setting_short_text": "CCM",
+  //    "value": "S"
+  //  },
+  //  {
+  //    "setting_short_text": "CCR",
+  //    "value": "H"
+  //  },
+  //  {
+  //    "setting_short_text": "CSR",
+  //    "value": "640x360"
+  //  },
+  //  {
+  //    "setting_short_text": "CVR",
+  //    "value": "H"
+  //  },
+  //  {
+  //    "setting_short_text": "CVL",
+  //    "value": "10"
+  //  },
+  //  {
+  //    "setting_short_text": "XD",
+  //    "value": "false"
+  //  },
+  //  {
+  //    "setting_short_text": "UA",
+  //    "value": "false"
+  //  },
+  //  {
+  //    "setting_short_text": "MSK",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "XU",
+  //    "value": ""
+  //  },
+  //  {
+  //    "setting_short_text": "LAT",
+  //    "value": "0"
+  //  },
+  //  {
+  //    "setting_short_text": "LON",
+  //    "value": "0"
+  //  },
+  //  {
+  //    "setting_short_text": "CNM",
+  //    "value": "MOULTRIECAM"
+  //  },
+  //  {
+  //    "setting_short_text": "CD",
+  //    "value": "10"
+  //  },
+  //  {
+  //    "setting_short_text": "CSV",
+  //    "value": "J225XV50i"
+  //  },
+  //  {
+  //    "setting_short_text": "CSS",
+  //    "value": "C"
+  //  }
+  //]

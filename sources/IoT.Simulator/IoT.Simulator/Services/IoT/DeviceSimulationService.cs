@@ -14,6 +14,9 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +36,8 @@ namespace IoT.Simulator.Services
         private int _telemetryInterval;
         private bool _stopProcessing = false;
 
+        private IProcessCompleteMessageService _processCompleteMessagingService;
+        private IStatusMessageService _statusMessagingService;
         private ITelemetryMessageService _telemetryMessagingService;
         private IErrorMessageService _errorMessagingService;
         private ICommissioningMessageService _commissioningMessagingService;
@@ -42,6 +47,8 @@ namespace IoT.Simulator.Services
         public DeviceSimulationService(
             IOptionsMonitor<DeviceSettings> deviceSettingsDelegate,
             IOptions<DPSSettings> dpsSettings,
+            IProcessCompleteMessageService processCompleteMessagingService,
+            IStatusMessageService statusMessagingService,
             ITelemetryMessageService telemetryMessagingService,
             IErrorMessageService errorMessagingService,
             ICommissioningMessageService commissioningMessagingService,
@@ -62,6 +69,12 @@ namespace IoT.Simulator.Services
 
             if (dpsSettings.Value == null)
                 throw new ArgumentNullException("dpsSettings.Value");
+
+            if (processCompleteMessagingService == null)
+                throw new ArgumentNullException(nameof(processCompleteMessagingService));
+
+            if (statusMessagingService == null)
+                throw new ArgumentNullException(nameof(statusMessagingService));
 
             if (telemetryMessagingService == null)
                 throw new ArgumentNullException(nameof(telemetryMessagingService));
@@ -89,6 +102,8 @@ namespace IoT.Simulator.Services
 
             _logger = loggerFactory.CreateLogger<DeviceSimulationService>();
 
+            _processCompleteMessagingService = processCompleteMessagingService;
+            _statusMessagingService = statusMessagingService;
             _telemetryMessagingService = telemetryMessagingService;
             _errorMessagingService = errorMessagingService;
             _commissioningMessagingService = commissioningMessagingService;
@@ -125,7 +140,7 @@ namespace IoT.Simulator.Services
             //Control if a connection string exists (ideally, stored in TPM/HSM or any secured location.
             //If there is no connection string, check if the DPS settings are provided.
             //If so, provision the device and persist the connection string for upcoming boots.
-            if (string.IsNullOrEmpty(_deviceSettingsDelegate.CurrentValue.ConnectionString))
+            if (string.IsNullOrEmpty(_deviceSettingsDelegate.CurrentValue.ConnectionString) || string.IsNullOrEmpty(_deviceSettingsDelegate.CurrentValue.Certpfxbase64data))
             {
                 string connectionString = await _provisioningService.ProvisionDevice();
 
@@ -152,8 +167,70 @@ namespace IoT.Simulator.Services
                             _dpsSettings.GroupEnrollment.SymmetricKeySettings.TransportType);
                     else if (_dpsSettings.GroupEnrollment.SecurityType == SecurityType.X509CA)
                     {
-                        string deviceCertificateFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _dpsSettings.GroupEnrollment.CAX509Settings.DeviceX509Path);
-                        X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(deviceCertificateFullPath, _dpsSettings.GroupEnrollment.CAX509Settings.Password);
+                        //string deviceCertificateFullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _dpsSettings.GroupEnrollment.CAX509Settings.DeviceX509Path);
+                        //X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(deviceCertificateFullPath, _dpsSettings.GroupEnrollment.CAX509Settings.Password);
+                        //string parameterDeviceId = _deviceSettingsDelegate.CurrentValue.ArtifactId;
+                        //var request = new ProvisionDataRequest() { IMEI = parameterDeviceId, ICCID = _dpsSettings.GroupEnrollment.CAX509Settings.Password };
+
+                        //JsonContent content = JsonContent.Create(request);
+
+                        //var jsonContent = JsonConvert.SerializeObject(request);
+                        //var contentString = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                        //contentString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+
+                        //var httpClient = new HttpClient();
+                        ////httpClient.BaseAddress = new Uri("https://mmdev-devicecoreapi.azurewebsites.net/");
+                        //httpClient.BaseAddress = new Uri("https://localhost:5001/");
+
+                        //var response = await httpClient.PostAsync("api/v2/Device/provision", contentString);
+
+                        //var returnValue = await response.Content.ReadFromJsonAsync<ProvisionDataResponse>();
+
+
+                        var deviceInPfxBytes = Convert.FromBase64String(_deviceSettingsDelegate.CurrentValue.Certpfxbase64data);
+
+                        X509Certificate2 cert = null;
+                        var certificateCollection = new X509Certificate2Collection();
+                        var outcollection = new X509Certificate2Collection();
+
+                        certificateCollection.Import(
+                                deviceInPfxBytes,
+                                _deviceSettingsDelegate.CurrentValue.ICCID,
+                                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.UserKeySet);
+
+                        foreach (X509Certificate2 element in certificateCollection)
+                        {
+                            Console.WriteLine($"Found certificate: {element?.Thumbprint} " +
+                                $"{element?.Subject}; PrivateKey: {element?.HasPrivateKey}");
+
+
+                            if (cert == null && element.HasPrivateKey)
+                            {
+                                cert = element;
+                            }
+                            else
+                            {
+                                outcollection.Add(element);
+                            }
+
+                        }
+
+                        if (cert == null)
+                        {
+                            Console.WriteLine($"ERROR: PFX did not " +
+                                $"contain any certificate with a private key.");
+
+                            //return Ok(response);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Using certificate {cert.Thumbprint} " +
+                                $"{cert.Subject}");
+                        }
+
+                        X509Certificate2 deviceLeafProvisioningCertificate = cert;
+                        //X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(certByteArray, _dpsSettings.GroupEnrollment.CAX509Settings.Password);
 
                         IAuthenticationMethod auth = new DeviceAuthenticationWithX509Certificate(_deviceSettingsDelegate.CurrentValue.DeviceId, deviceLeafProvisioningCertificate);
 
@@ -182,6 +259,12 @@ namespace IoT.Simulator.Services
                     //Messages
                     if (_simulationSettings.EnableLatencyTests)
                         SendDeviceToCloudLatencyTestAsync(_deviceSettingsDelegate.CurrentValue.DeviceId, _simulationSettings.LatencyTestsFrecuency);
+
+                    if (_simulationSettings.EnableStatusMessages)
+                        SendDeviceToCloudStatusMessagesAsync(_deviceSettingsDelegate.CurrentValue.DeviceId, _simulationSettings.StatusFrecuency);
+                    
+                    if (_simulationSettings.EnableProcessCompleteMessages)
+                        SendDeviceToCloudProcessCompleteMessagesAsync(_deviceSettingsDelegate.CurrentValue.DeviceId, _simulationSettings.ProcessCompleteFrecuency);
 
                     if (_simulationSettings.EnableTelemetryMessages)
                         SendDeviceToCloudMessagesAsync(_deviceSettingsDelegate.CurrentValue.DeviceId); //interval is a global variable changed by processes
@@ -230,6 +313,89 @@ namespace IoT.Simulator.Services
         #region D2C                
 
         // Async method to send simulated telemetry
+        internal async Task SendDeviceToCloudStatusMessagesAsync(string deviceId, int interval)
+        {
+            int counter = 0;
+            string logPrefix = "status".BuildLogPrefix();
+
+            string messageString = string.Empty;
+
+            using (_logger.BeginScope($"{logPrefix}::{DateTime.Now}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::STATUS"))
+            {
+                while (true)
+                {
+                    //Randomize data
+                    messageString = await _statusMessagingService.GetRandomizedMessageAsync(deviceId, string.Empty);
+
+                    var message = new Message(Encoding.UTF8.GetBytes(messageString));
+                    message.Properties.Add("messageType", "status");
+
+                    // Add a custom application property to the message.
+                    // An IoT hub can filter on these properties without access to the message body.
+                    //message.Properties.Add("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
+                    message.ContentType = "application/json";
+                    message.ContentEncoding = "utf-8";
+
+                    // Send the tlemetry message
+                    await _deviceClient.SendEventAsync(message);
+                    counter++;
+
+                    _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Sent message: {messageString}.");
+                    _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::COUNTER: {counter}.");
+
+                    if (_stopProcessing)
+                    {
+                        _logger.LogDebug($"{logPrefix}::STOP PROCESSING.");
+                        break;
+                    }
+
+                    await Task.Delay(interval * 1000);
+                }
+            }
+        }
+
+        // Async method to send simulated telemetry
+        internal async Task SendDeviceToCloudProcessCompleteMessagesAsync(string deviceId, int interval)
+        {
+            int counter = 0;
+            string logPrefix = "processComplete".BuildLogPrefix();
+
+            string messageString = string.Empty;
+
+            using (_logger.BeginScope($"{logPrefix}::{DateTime.Now}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::PROCESS COMPLETE"))
+            {
+                while (true)
+                {
+                    //Randomize data
+                    messageString = await _processCompleteMessagingService.GetRandomizedMessageAsync(deviceId, string.Empty);
+
+                    var message = new Message(Encoding.UTF8.GetBytes(messageString));
+                    message.Properties.Add("messageType", "processcomplete");
+
+                    // Add a custom application property to the message.
+                    // An IoT hub can filter on these properties without access to the message body.
+                    //message.Properties.Add("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
+                    message.ContentType = "application/json";
+                    message.ContentEncoding = "utf-8";
+
+                    // Send the tlemetry message
+                    await _deviceClient.SendEventAsync(message);
+                    counter++;
+
+                    _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Sent message: {messageString}.");
+                    _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::COUNTER: {counter}.");
+
+                    if (_stopProcessing)
+                    {
+                        _logger.LogDebug($"{logPrefix}::STOP PROCESSING.");
+                        break;
+                    }
+
+                    await Task.Delay(interval * 1000);
+                }
+            }
+        }
+
         internal async Task SendDeviceToCloudMessagesAsync(string deviceId)
         {
             int counter = 0;
@@ -438,6 +604,10 @@ namespace IoT.Simulator.Services
                 await _deviceClient.CompleteAsync(receivedMessage);
                 _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Received message: {Encoding.ASCII.GetString(receivedMessage.GetBytes())}.");
 
+                foreach (var item in receivedMessage.Properties)
+                {
+                    _logger.LogDebug($"{logPrefix}::{_deviceSettingsDelegate.CurrentValue.ArtifactId}::Received message property key: '{item.Key}' Value: '{item.Value}'");
+                }
                 receivedMessage = null;
             }
         }

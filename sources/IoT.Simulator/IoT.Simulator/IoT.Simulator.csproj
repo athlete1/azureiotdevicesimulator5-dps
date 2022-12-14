@@ -89,6 +89,12 @@ The first version was based on symmetric keys and a new version adds CA X509 key
     <None Update="Messages\error.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Messages\processcomplete.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Messages\status.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Messages\measureddata.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -109,6 +115,12 @@ The first version was based on symmetric keys and a new version adds CA X509 key
       <IsTransformFile>true</IsTransformFile>
       <DependentUpon>devicesettings.json</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="X509\jrsimulateddevice4.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="X509\new-device.cert.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="X509\new-device.devx5092.cert.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

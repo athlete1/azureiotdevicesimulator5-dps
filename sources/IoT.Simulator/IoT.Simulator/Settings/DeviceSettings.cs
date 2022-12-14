@@ -15,6 +15,9 @@ namespace IoT.Simulator.Settings
         public SimulationSettingsDevice SimulationSettings
         { get; set; }
 
+        [JsonProperty("certpfxbase64data")]
+        public string Certpfxbase64data { get; set; }
+
 
     }
 }

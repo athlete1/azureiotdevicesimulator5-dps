@@ -1,0 +1,103 @@
+{
+  "deviceId": "",
+  "moduleId": "",
+  "deviceModel": "FeedHub",
+  "timestamp": 0,
+  "schemaVersion": "v1.0",
+  "messageType": "processcomplete",
+  "data": [
+    {
+      "key": "CID",
+      "value": "0"
+    },
+    {
+      "key": "BT",
+      "value": "24288"
+    },
+    {
+      "key": "BV",
+      "value": "7352"
+    },
+    {
+      "key": "CBL",
+      "value": "25"
+    },
+    {
+      "key": "CE",
+      "value": ""
+    },
+    {
+      "key": "CFB",
+      "value": "768212992"
+    },
+    {
+      "key": "CHF",
+      "value": ""
+    },
+    {
+      "key": "CS",
+      "value": "S"
+    },
+    {
+      "key": "CTB",
+      "value": "7767851008"
+    },
+    {
+      "key": "EC",
+      "value": "-17"
+    },
+    {
+      "key": "GPF",
+      "value": "36"
+    },
+    {
+      "key": "ICS",
+      "value": "1"
+    },
+    {
+      "key": "LCS",
+      "value": "0"
+    },
+    {
+      "key": "LFN",
+      "value": ""
+    },
+    {
+      "key": "LSZ",
+      "value": "-1"
+    },
+    {
+      "key": "MBL",
+      "value": "25"
+    },
+    {
+      "key": "MP",
+      "value": "L"
+    },
+    {
+      "key": "MPC",
+      "value": "F"
+    },
+    {
+      "key": "MV",
+      "value": "1.0.34"
+    },
+    {
+      "key": "RS",
+      "value": "-98"
+    },
+    {
+      "key": "VCS",
+      "value": "0"
+    },
+    {
+      "key": "LAT",
+      "value": "38.325283 N"
+    },
+    {
+      "key": "LON",
+      "value": "93.361084 W"
+    }
+  ]
+}
+ 

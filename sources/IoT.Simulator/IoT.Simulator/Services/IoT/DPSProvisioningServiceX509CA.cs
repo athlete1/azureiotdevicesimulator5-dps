@@ -17,6 +17,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -83,7 +84,34 @@ namespace IoT.Simulator.Services
                     // X509 device leaf certificate
                     string parameterDeviceId = _deviceSettingsDelegate.CurrentValue.ArtifactId;
 
-                    X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(deviceCertificateFullPath, _dpsSettings.GroupEnrollment.CAX509Settings.Password);                    
+
+                    //var myObject = new
+                    //{
+                    //    imei = parameterDeviceId,
+                    //    iccid = "1234",
+                    //};
+
+                    var request = new ProvisionDataRequest() { IMEI = parameterDeviceId, ICCID = _deviceSettingsDelegate.CurrentValue.ICCID };
+
+                    JsonContent content = JsonContent.Create(request);
+
+                    var jsonContent = JsonConvert.SerializeObject(request);
+                    var contentString = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    contentString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                    
+                    var httpClient = new HttpClient();
+                    httpClient.BaseAddress = new Uri("https://deviceapi-linux.dev.moultriemobile.dev/");
+                    //httpClient.BaseAddress = new Uri("https://localhost:5001/");
+
+                    var response = await httpClient.PostAsync("api/v2/Device/provision", contentString);
+                    
+                    var returnValue = await response.Content.ReadFromJsonAsync<ProvisionDataResponse>();
+
+                    _deviceSettingsDelegate.CurrentValue.Certpfxbase64data = returnValue.PFXCertData;
+                    var certByteArray = Convert.FromBase64String(returnValue.PFXCertData);
+                    X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(certByteArray, _deviceSettingsDelegate.CurrentValue.ICCID);
+                    //X509Certificate2 deviceLeafProvisioningCertificate = new X509Certificate2(deviceCertificateFullPath, _dpsSettings.GroupEnrollment.CAX509Settings.Password);                    
                     _deviceSettingsDelegate.CurrentValue.DeviceId = deviceLeafProvisioningCertificate.Subject.Remove(0, 3); //delete the 'CN='
 
                     if (parameterDeviceId != _deviceSettingsDelegate.CurrentValue.DeviceId)
@@ -330,5 +358,22 @@ namespace IoT.Simulator.Services
         {
             return true;
         }
+    }
+
+
+    public class ProvisionDataRequest
+    {
+        public string IMEI { get; set; }
+        public string ICCID { get; set; }
+    }
+
+    public class ProvisionDataResponse
+    {
+        public string DPSEndpoint { get; set; }
+        public string DPSScopeId { get; set; }
+        public string PFXUrl { get; set; }
+        public string PFXCertData { get; set; }
+        public string CertData { get; set; }
+        public string Key { get; set; }
     }
 }

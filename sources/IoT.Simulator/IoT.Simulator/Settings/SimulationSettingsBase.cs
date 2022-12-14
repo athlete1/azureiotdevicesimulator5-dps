@@ -6,6 +6,16 @@ namespace IoT.Simulator.Settings
 {
     public class SimulationSettingsBase
     {
+        [JsonProperty("enableStatusMessages")]
+        public bool EnableStatusMessages { get; set; }
+        [JsonProperty("statusFrecuency")]
+        public int StatusFrecuency { get; set; }
+
+        [JsonProperty("enableProcessCompleteMessages")]
+        public bool EnableProcessCompleteMessages { get; set; }
+        [JsonProperty("processCompleteFrecuency")]
+        public int ProcessCompleteFrecuency { get; set; }
+
         [JsonProperty("enableTelemetryMessages")]
         public bool EnableTelemetryMessages { get; set; }
         [JsonProperty("telemetryFrecuency")]

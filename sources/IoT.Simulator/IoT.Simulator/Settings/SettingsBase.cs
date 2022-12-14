@@ -35,6 +35,9 @@ namespace IoT.Simulator.Settings
         [JsonProperty("deviceId", Required = Required.Always, NullValueHandling = NullValueHandling.Include)]
         public string DeviceId { get;set; }
 
+        [JsonProperty("iccid", Required = Required.Always, NullValueHandling = NullValueHandling.Include)]
+        public string ICCID { get; set; }
+
         public string HostName
         {
             get;set;
